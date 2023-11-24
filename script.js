@@ -9,7 +9,6 @@ let equalsButtonClicked = false;
 const equal = document.querySelector(".equals");
 
 
-
 const add = function(a, b) {
     return a + b;
 };
@@ -47,22 +46,49 @@ const operate = function(a, operator, b) {
     }
 };
 
+//Looping through numbers and adding event listener to each one. 
+document.querySelectorAll(".number").forEach(button => {
+    button.addEventListener('click', () => {
+        const number = button.textContent; //When the number is clicked saving it in number variable 
+        appendNumber(number);   //Passing number to appendNumber function
+    })
+})
+
+//Looping through operations and adding event listener to each one. 
+document.querySelectorAll('.plus, .minus, .multiplication, .division').forEach(button => {
+    button.addEventListener('click', () => {
+        const operator = button.textContent; //When clicked saving clicked operator in operator variable.
+        appendOperator(operator);   //Passing operator to appendOperator function
+    });
+});
+
+//Adding event listener to equal button
+equal.addEventListener('click', function() {
+    equalsButtonClicked = true; //Changing the flag when the equal button clicked
+    calculate(currentValue, operator, nextValue); //Calculating the result when the equal button is clicked
+});
+
+//Clear the display when the CLEAR button clicked
+document.querySelector('.clear').addEventListener('click', clearDisplay);
+
+
 //Appending numbers to global variables
 function appendNumber(number) {
-    if(!isFirstNumberEntered) { //Checking if it is the first number 
-        currentValue = parseFloat(number);
+    if (!isFirstNumberEntered) { // Checking if it is the first number
+        currentValue = parseFloat(currentValue + number); // Concatenate the digits to the current value
     } else {
         // Check if nextValue is already set
         if (nextValue === "") {
             nextValue = parseFloat(number);
         } else {
-            // Reset nextValue to the new number
-            nextValue = parseFloat(number);
+            // Concatenate the digits to the next value
+            nextValue = parseFloat(nextValue + number);
         }
     }
 
     updateDisplay();
 }
+
 
 //Checking if we can add the opetor to display
 function appendOperator(operatorSymbol) {
@@ -81,13 +107,13 @@ function appendOperator(operatorSymbol) {
     updateDisplay();
 }
 //Calculating the result
-function calculate(currentValue, operator, nextValue) {
-    const a = currentValue;
-    const b = nextValue;
+function calculate() {
+    const a = parseFloat(currentValue);
+    const b = parseFloat(nextValue);
 
     if (!isNaN(a) && !isNaN(b)) {
         result = operate(a, operator, b);
-        currentValue = result; // Update currentValue with the result
+        currentValue = result.toString(); // Update currentValue with the result
         nextValue = ""; // Reset nextValue
         updateDisplay(result);
         isFirstNumberEntered = false;
@@ -98,6 +124,7 @@ function calculate(currentValue, operator, nextValue) {
     equalsButtonClicked = false;
     return result;
 }
+
 
 
 //Function for showing what is currently displaying on the page
@@ -126,27 +153,3 @@ function clearDisplay() {
     updateDisplay();
 }
 
-//Looping through numbers and adding event listener to each one. 
-document.querySelectorAll(".number").forEach(button => {
-    button.addEventListener('click', () => {
-        const number = button.textContent; //When the number is clicked saving it in number variable 
-        appendNumber(number);   //Passing number to appendNumber function
-    })
-})
-
-//Looping through operations and adding event listener to each one. 
-document.querySelectorAll('.plus, .minus, .multiplication, .division').forEach(button => {
-    button.addEventListener('click', () => {
-        const operator = button.textContent; //When clicked saving clicked operator in operator variable.
-        appendOperator(operator);   //Passing operator to appendOperator function
-    });
-});
-
-//Adding event listener to equal button
-equal.addEventListener('click', function() {
-    equalsButtonClicked = true; //Changing the flag when the equal button clicked
-    calculate(currentValue, operator, nextValue); //Calculating the result when the equal button is clicked
-});
-
-//Clear the display when the CLEAR button clicked
-document.querySelector('.clear').addEventListener('click', clearDisplay);
