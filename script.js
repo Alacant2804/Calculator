@@ -93,8 +93,7 @@ function appendNumber(number) {
 //Checking if we can add the opetor to display
 function appendOperator(operatorSymbol) {
     if (!isFirstNumberEntered) {
-        operator = operatorSymbol;
-        isFirstNumberEntered = true;
+        return;
     } else {
         // Check if there is a previous result
         if (result !== 0) {
