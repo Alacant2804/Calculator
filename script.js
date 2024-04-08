@@ -104,7 +104,6 @@ const calculate = () => {
         currentValue = result.toString();
         nextValue = "";
         updateDisplay(result);
-        isFirstNumberEntered = false;
     } else {
         console.error("Invalid numeric input!");
     }
