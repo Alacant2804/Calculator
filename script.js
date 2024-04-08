@@ -1,155 +1,119 @@
-let currentValue = "";
-let nextValue = "";
-let operator = "";
-let result = 0;
+document.addEventListener('DOMContentLoaded', () => {
+    let currentValue = "";
+    let nextValue = "";
+    let operator = "";
+    let result = 0;
 
-let isFirstNumberEntered = false;
-let equalsButtonClicked = false;
+    let isFirstNumberEntered = false;
+    let equalsButtonClicked = false;
 
-const equal = document.querySelector(".equals");
+    const numbers = document.querySelectorAll(".number");
+    const operators = document.querySelectorAll('.plus, .minus, .multiplication, .division');
+    const equal = document.querySelector(".equals");
+    const clearButton = document.querySelector('.clear');
+    const display = document.querySelector(".display");
 
+    const add = (a, b) => a + b;
 
-const add = function(a, b) {
-    return a + b;
-};
+    const subtract = (a, b) => a - b;
 
-const subtract = function(a, b) {
-    return a - b;
-};
+    const multiply = (a, b) => a * b;
 
-const multiply = function(a, b) {
-    return a * b;
-};
+    const divide = (a, b) => {
+        if (b !== 0) {
+            return a / b;
+        } else {
+            throw new Error("Cannot divide by zero");
+        }
+    };
 
-const divide = function(a, b) {
-    if (b !== 0) {
-        return a / b;
-    } else {
-        console.error("Cannot divide by zero");
-        return;
-    }
-};
+    const operate = (a, operator, b) => {
+        switch (operator) {
+            case "+":
+                return add(a, b);
+            case "-":
+                return subtract(a, b);
+            case "*":
+                return multiply(a, b);
+            case "/":
+                return divide(a, b);
+            default:
+                throw new Error("Invalid operator");
+        }
+    };
 
-const operate = function(a, operator, b) {
-    switch (operator) {
-        case "+":
-            return add(a, b);
-        case "-":
-            return subtract(a, b);
-        case "*":
-            return multiply(a, b);
-        case "/":
-            return divide(a, b);
-        default:
-            console.error("Invalid operator");
-            return;
-    }
-};
+    const updateDisplay = () => {
+        if (equalsButtonClicked) {
+            display.value = result;
+        } else {
+            display.value = currentValue + operator + nextValue;
+        }
+    };
 
-//Looping through numbers and adding event listener to each one. 
-document.querySelectorAll(".number").forEach(button => {
-    button.addEventListener('click', () => {
-        const number = button.textContent; //When the number is clicked saving it in number variable 
-        appendNumber(number);   //Passing number to appendNumber function
-    })
-})
+    const clearDisplay = () => {
+        currentValue = "";
+        operator = "";
+        nextValue = "";
+        updateDisplay();
+    };
 
-//Looping through operations and adding event listener to each one. 
-document.querySelectorAll('.plus, .minus, .multiplication, .division').forEach(button => {
-    button.addEventListener('click', () => {
-        const operator = button.textContent; //When clicked saving clicked operator in operator variable.
-        appendOperator(operator);   //Passing operator to appendOperator function
+    const appendNumber = number => {
+        if (!isFirstNumberEntered) {
+            currentValue += number;
+        } else {
+            nextValue += number;
+        }
+        updateDisplay();
+    };
+
+    numbers.forEach(button => {
+        button.addEventListener('click', () => {
+            const number = button.textContent;
+            appendNumber(number);
+        })
     });
-});
 
-//Adding event listener to equal button
-equal.addEventListener('click', function() {
-    equalsButtonClicked = true; //Changing the flag when the equal button clicked
-    calculate(currentValue, operator, nextValue); //Calculating the result when the equal button is clicked
-});
-
-//Clear the display when the CLEAR button clicked
-document.querySelector('.clear').addEventListener('click', clearDisplay);
-
-
-//Appending numbers to global variables
-function appendNumber(number) {
-    if (!isFirstNumberEntered) { // Checking if it is the first number
-        currentValue = parseFloat(currentValue + number); // Concatenate the digits to the current value
-    } else {
-        // Check if nextValue is already set
-        if (nextValue === "") {
-            nextValue = parseFloat(number);
+    const appendOperator = operatorSymbol => {
+        if (!isFirstNumberEntered) {
+            operator = operatorSymbol;
+            isFirstNumberEntered = true;
         } else {
-            // Concatenate the digits to the next value
-            nextValue = parseFloat(nextValue + number);
+            if (nextValue !== "") {
+                calculate();
+            }
+            operator = operatorSymbol;
         }
-    }
+        updateDisplay();
+    };
 
-    updateDisplay();
-}
+    operators.forEach(button => {
+        button.addEventListener('click', () => {
+            const operatorSymbol = button.textContent;
+            appendOperator(operatorSymbol);
+        });
+    });
 
+    equal.addEventListener('click', () => {
+        equalsButtonClicked = true;
+        calculate();
+    });
 
-//Checking if we can add the opetor to display
-function appendOperator(operatorSymbol) {
-    if (!isFirstNumberEntered) {
-        operator = operatorSymbol;
-        isFirstNumberEntered = true;
-    } else {
-        // Check if there is a previous result
-        if (result !== 0) {
-            currentValue = result;
-            result = 0; // Reset the result
-        }
-        operator = operatorSymbol;
-    }
+    clearButton.addEventListener('click', clearDisplay);
 
-    updateDisplay();
-}
-//Calculating the result
-function calculate() {
-    const a = parseFloat(currentValue);
-    const b = parseFloat(nextValue);
+    const calculate = () => {
+        const a = parseFloat(currentValue);
+        const b = parseFloat(nextValue);
 
-    if (!isNaN(a) && !isNaN(b)) {
-        result = operate(a, operator, b);
-        currentValue = result.toString(); // Update currentValue with the result
-        nextValue = ""; // Reset nextValue
-        updateDisplay(result);
-        isFirstNumberEntered = false;
-    } else {
-        console.log("Invalid numeric input!");
-    }
-
-    equalsButtonClicked = false;
-    return result;
-}
-
-
-
-//Function for showing what is currently displaying on the page
-function updateDisplay(result) {
-    if (equalsButtonClicked) {
-        // Update the display only if the equals button was clicked
-        document.querySelector(".display").value = result;
-    } else {
-        // Update the display with the current value, operator, and next value
-        if (result !== undefined && result !== null) {
-            // If there is a result, display it along with the operator and next value
-            document.querySelector(".display").value = result + operator + nextValue;
+        if (!isNaN(a) && !isNaN(b)) {
+            result = operate(a, operator, b);
+            currentValue = result.toString();
+            nextValue = "";
+            updateDisplay(result);
+            isFirstNumberEntered = false;
         } else {
-            // Otherwise, display the current value, operator, and next value
-            document.querySelector(".display").value = currentValue + operator + nextValue;
+            console.error("Invalid numeric input!");
         }
-    }
-}
 
-
-//Function for clearing display
-function clearDisplay() {
-    currentValue = "";
-    operator = "";
-    nextValue = ""; 
-    updateDisplay();
-}
-
+        equalsButtonClicked = false;
+    };
+});
